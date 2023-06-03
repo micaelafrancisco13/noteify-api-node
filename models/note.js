@@ -24,6 +24,7 @@ const noteSchema = new mongoose.Schema({
     ref: "Category",
     required: true,
   },
+  upcomingDate: { type: Date, required: true },
 });
 
 noteSchema.pre("findOneAndUpdate", async function () {
@@ -39,6 +40,7 @@ function validateNote(note) {
     title: joi.string().min(1).max(255).required().label("Title"),
     description: joi.string().min(1).max(255).required().label("Description"),
     categoryId: joi.objectId().required().label("Category ID"),
+    upcomingDate: joi.date().required().label("Upcoming date"),
   });
 
   return schema.validate(note);

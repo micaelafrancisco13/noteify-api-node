@@ -8,10 +8,10 @@ router.get("/", async (req, res) => {
   res.send(categories);
 });
 
-router.get("/names", async (req, res) => {
+router.get("/ids", async (req, res) => {
   const categories = await Category.find().sort("name");
 
-  res.send(categories.map((c) => c.name));
+  res.send(categories.map((c) => c._id));
 });
 
 router.post("/", async (req, res) => {

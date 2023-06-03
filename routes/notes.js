@@ -2,11 +2,29 @@ const { Category } = require("../models/category");
 const { Note, validate, isObjectIdValid } = require("../models/note");
 const express = require("express");
 const router = express.Router();
+const { startOfDay, isEqual, isBefore, isAfter } = require("date-fns");
 
 router.get("/", async (req, res) => {
-  const notes = await Note.find()
+  const filter = req.query.filter;
+
+  let notes = await Note.find()
     .sort({ dateLastModified: -1 })
     .populate("category");
+
+  const currentDate = startOfDay(new Date());
+  if (filter === "today")
+    notes = notes.filter((n) =>
+      isEqual(startOfDay(n.dateLastModified), currentDate)
+    );
+  else if (filter === "upcoming")
+    notes = notes.filter((n) =>
+      isAfter(startOfDay(new Date(n.dateLastModified)), currentDate)
+    );
+  else if (filter === "past")
+    notes = notes.filter((n) =>
+      isBefore(startOfDay(new Date(n.dateLastModified)), currentDate)
+    );
+
   res.send(notes);
 });
 
@@ -14,7 +32,7 @@ router.post("/", async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const { title, description, categoryId } = req.body;
+  const { title, description, categoryId, upcomingDate } = req.body;
 
   const category = await Category.findById(categoryId);
   if (!category)
@@ -26,6 +44,7 @@ router.post("/", async (req, res) => {
     title,
     description,
     category: categoryId,
+    upcomingDate,
   });
   await note.save();
   note = await note.populate("category");
