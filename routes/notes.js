@@ -14,15 +14,15 @@ router.get("/", async (req, res) => {
   const currentDate = startOfDay(new Date());
   if (filter === "today")
     notes = notes.filter((n) =>
-      isEqual(startOfDay(n.dateLastModified), currentDate)
+      isEqual(startOfDay(new Date(n.upcomingDate)), currentDate)
     );
   else if (filter === "upcoming")
     notes = notes.filter((n) =>
-      isAfter(startOfDay(new Date(n.dateLastModified)), currentDate)
+      isAfter(startOfDay(new Date(n.upcomingDate)), currentDate)
     );
   else if (filter === "past")
     notes = notes.filter((n) =>
-      isBefore(startOfDay(new Date(n.dateLastModified)), currentDate)
+      isBefore(startOfDay(new Date(n.upcomingDate)), currentDate)
     );
 
   res.send(notes);

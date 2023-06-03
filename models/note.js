@@ -1,6 +1,7 @@
 const joi = require("joi");
 const objectId = require("joi-objectid");
 const mongoose = require("mongoose");
+const { startOfDay } = require("date-fns");
 
 const noteSchema = new mongoose.Schema({
   title: {
@@ -40,7 +41,15 @@ function validateNote(note) {
     title: joi.string().min(1).max(255).required().label("Title"),
     description: joi.string().min(1).max(255).required().label("Description"),
     categoryId: joi.objectId().required().label("Category ID"),
-    upcomingDate: joi.date().required().label("Upcoming date"),
+    upcomingDate: joi
+      .date()
+      .min(startOfDay(new Date()))
+      .required()
+      .label("Upcoming date")
+      .messages({
+        "date.min": '"Upcoming date" must be a date in the future',
+        "any.required": '"Upcoming date" is required',
+      }),
   });
 
   return schema.validate(note);
