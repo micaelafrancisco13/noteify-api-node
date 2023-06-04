@@ -3,11 +3,32 @@ joi.objectId = require("joi-objectid")(joi);
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
-  name: {
+  firstName: {
     type: String,
+    maxLength: 255,
     minLength: 2,
-    maxLength: 50,
+    required: true,
     trim: true,
+  },
+  lastName: {
+    type: String,
+    maxLength: 255,
+    minLength: 2,
+    required: true,
+    trim: true,
+  },
+  email: {
+    type: String,
+    maxLength: 255,
+    minLength: 2,
+    required: true,
+    trim: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    minLength: 8,
+    maxLength: 1024,
     required: true,
   },
 });
