@@ -1,5 +1,5 @@
 {
-    "jwtPrivateKey": "unsecurekey",
+    "jwtPrivateKey": "notSecureKey",
     "db": "mongodb://127.0.0.1:27017/get-done",
     "port": "3000",
     "requiresAuth": true
