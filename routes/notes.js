@@ -67,7 +67,7 @@ router.put("/:noteId", async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const { title, description, categoryId } = req.body;
+  const { title, description, categoryId, upcomingDate } = req.body;
 
   const category = await Category.findById(categoryId);
   if (!category)
@@ -81,6 +81,7 @@ router.put("/:noteId", async (req, res) => {
       title,
       description,
       category: categoryId,
+      upcomingDate,
     },
     { new: true }
   ).populate("category");
