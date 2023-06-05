@@ -1,5 +1,4 @@
 const joi = require("joi");
-joi.objectId = require("joi-objectid")(joi);
 const mongoose = require("mongoose");
 
 const categorySchema = new mongoose.Schema({

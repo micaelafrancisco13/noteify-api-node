@@ -1,7 +1,6 @@
 const joi = require("joi");
 const config = require("config");
 const jwt = require("jsonwebtoken");
-joi.objectId = require("joi-objectid")(joi);
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
@@ -77,8 +76,8 @@ function validatePersonalDetails(user) {
 
   return joi
     .object({
-      firstName: baseSchema.extract("firstName"),
-      lastName: baseSchema.extract("lastName"),
+      firstName: baseSchema.extract("firstName").label("First name"),
+      lastName: baseSchema.extract("lastName").label("Last name"),
     })
     .validate(user);
 }
@@ -88,7 +87,7 @@ function validateEmail(user) {
 
   return joi
     .object({
-      email: baseSchema.extract("email"),
+      email: baseSchema.extract("email").label("Email"),
     })
     .validate(user);
 }
@@ -98,7 +97,7 @@ function validatePassword(user) {
 
   return joi
     .object({
-      password: baseSchema.extract("password"),
+      password: baseSchema.extract("password").label("Password"),
     })
     .validate(user);
 }
