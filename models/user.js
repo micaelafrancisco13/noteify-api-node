@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
     minLength: 2,
     required: true,
     trim: true,
-    dateModified: { type: Date, default: Date.now },
+    dateLastModified: { type: Date, default: Date.now },
   },
   lastName: {
     type: String,
@@ -19,7 +19,6 @@ const userSchema = new mongoose.Schema({
     minLength: 2,
     required: true,
     trim: true,
-    dateModified: { type: Date, default: Date.now },
   },
   email: {
     type: String,
@@ -28,14 +27,12 @@ const userSchema = new mongoose.Schema({
     required: true,
     trim: true,
     unique: true,
-    dateModified: { type: Date, default: Date.now },
   },
   password: {
     type: String,
     minLength: 8,
     maxLength: 1024,
     required: true,
-    dateModified: { type: Date, default: Date.now },
   },
   dateRegistered: { type: Date, default: Date.now },
   dateLoggedIn: { type: Date, default: Date.now },

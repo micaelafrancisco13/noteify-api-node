@@ -58,11 +58,11 @@ router.put("/:noteId", async (req, res) => {
   if (!isObjectIdValid(noteId))
     return res.status(400).send("Invalid object ID.");
 
-  let note = await Note.findById(noteId);
-  if (!note)
-    return res
-      .status(404)
-      .send(`The note with the ID of ${noteId} was not found.`);
+  // let note = await Note.findById(noteId);
+  // if (!note)
+  //   return res
+  //     .status(404)
+  //     .send(`The note with the ID of ${noteId} was not found.`);
 
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
@@ -75,16 +75,18 @@ router.put("/:noteId", async (req, res) => {
       .status(404)
       .send(`The category with the ID of ${categoryId} was not found.`);
 
-  note = await Note.findOneAndUpdate(
-    { _id: noteId },
-    {
-      title,
-      description,
-      category: categoryId,
-      upcomingDate,
-    },
-    { new: true }
-  ).populate("category");
+  let note = await Note.findById(noteId);
+  if (!note)
+    return res
+      .status(404)
+      .send(`The note with the ID of ${noteId} was not found.`);
+
+  note.title = title;
+  note.description = description;
+  note.category = categoryId;
+  note.upcomingDate = upcomingDate;
+  await note.save();
+  note = await note.populate("category");
 
   res.send(note);
 });

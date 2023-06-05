@@ -28,10 +28,8 @@ const noteSchema = new mongoose.Schema({
   upcomingDate: { type: Date, required: true },
 });
 
-noteSchema.pre("findOneAndUpdate", async function () {
-  const note = await this.model.findOne(this.getQuery());
-  note.dateLastModified = Date.now();
-  await note.save();
+noteSchema.pre("save", async function () {
+  this.dateLastModified = Date.now();
 });
 
 const Note = mongoose.model("note", noteSchema);

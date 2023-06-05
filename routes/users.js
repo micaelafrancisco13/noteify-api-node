@@ -10,7 +10,7 @@ router.get("/", [auth], async (req, res) => {
     return res.status(400).send("Invalid object ID.");
 
   const user = await User.findById(req.user._id).select(
-    "-password -notes -__v"
+    "-password -notes"
   );
   if (!user)
     return res.status(404).send("The user with the given ID was not found.");
@@ -40,7 +40,7 @@ router.post("/", async (req, res) => {
   res
     .header("x-auth-token", token)
     .header("access-control-expose-headers", "x-auth-token")
-    .send(_.omit(user._doc, ["password", "__v"]));
+    .send(_.omit(user._doc, ["password"]));
 });
 
 module.exports = router;
