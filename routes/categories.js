@@ -1,8 +1,9 @@
+const auth = require("../middleware/auth");
 const { Category, validate, isObjectIdValid } = require("../models/category");
 const express = require("express");
 const router = express.Router();
 
-router.get("/", async (req, res) => {
+router.get("/", [auth], async (req, res) => {
   const categories = await Category.find().sort("name");
 
   res.send(categories);
