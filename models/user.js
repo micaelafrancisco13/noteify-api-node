@@ -53,8 +53,8 @@ userSchema.methods.generateAuthToken = function () {
 
 const User = mongoose.model("User", userSchema);
 
-function validateUser(user) {
-  const schema = joi.object({
+function getJoiSchema() {
+  return joi.object({
     firstName: joi.string().min(2).max(255).required().label("First name"),
     lastName: joi.string().min(2).max(255).required().label("Last name"),
     email: joi
@@ -66,8 +66,41 @@ function validateUser(user) {
       .label("Email address"),
     password: joi.string().min(8).max(1024).required().label("Password"),
   });
+}
 
-  return schema.validate(user);
+function validateUser(user) {
+  return getJoiSchema().validate(user);
+}
+
+function validatePersonalDetails(user) {
+  const baseSchema = getJoiSchema();
+
+  return joi
+    .object({
+      firstName: baseSchema.extract("firstName"),
+      lastName: baseSchema.extract("lastName"),
+    })
+    .validate(user);
+}
+
+function validateEmail(user) {
+  const baseSchema = getJoiSchema();
+
+  return joi
+    .object({
+      email: baseSchema.extract("email"),
+    })
+    .validate(user);
+}
+
+function validatePassword(user) {
+  const baseSchema = getJoiSchema();
+
+  return joi
+    .object({
+      password: baseSchema.extract("password"),
+    })
+    .validate(user);
 }
 
 function isObjectIdValid(id) {
@@ -77,4 +110,7 @@ function isObjectIdValid(id) {
 exports.userSchema = userSchema;
 exports.User = User;
 exports.validate = validateUser;
+exports.validatePersonalDetails = validatePersonalDetails;
+exports.validateEmail = validateEmail;
+exports.validatePassword = validatePassword;
 exports.isObjectIdValid = isObjectIdValid;
