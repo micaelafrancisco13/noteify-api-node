@@ -5,15 +5,16 @@ const bcrypt = require("bcrypt");
 const express = require("express");
 const router = express.Router();
 
-router.get("/", [auth], async (req, res) => {
+router.post("/logout", async (req, res) => {
+  res.send("Logged out successfully!");
+});
+
+router.get("/me", [auth], async (req, res) => {
   if (!isObjectIdValid(req.user._id))
     return res.status(400).send("Invalid object ID.");
 
-  const user = await User.findById(req.user._id).select(
-    "-password -notes"
-  );
-  if (!user)
-    return res.status(404).send("The user with the given ID was not found.");
+  const user = await User.findById(req.user._id).select("-password -notes");
+  if (!user) return res.status(404).send("User does not exist.");
 
   res.send(user);
 });
@@ -38,9 +39,12 @@ router.post("/", async (req, res) => {
   const token = user.generateAuthToken();
 
   res
-    .header("x-auth-token", token)
-    .header("access-control-expose-headers", "x-auth-token")
+    .header("Authorization", `Bearer ${token}`)
     .send(_.omit(user._doc, ["password"]));
+  // res
+  //   .header("x-auth-token", token)
+  //   .header("access-control-expose-headers", "x-auth-token")
+  //   .send(_.omit(user._doc, ["password"]));
 });
 
 module.exports = router;

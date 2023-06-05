@@ -58,12 +58,6 @@ router.put("/:noteId", async (req, res) => {
   if (!isObjectIdValid(noteId))
     return res.status(400).send("Invalid object ID.");
 
-  // let note = await Note.findById(noteId);
-  // if (!note)
-  //   return res
-  //     .status(404)
-  //     .send(`The note with the ID of ${noteId} was not found.`);
-
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
