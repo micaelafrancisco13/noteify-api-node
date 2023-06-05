@@ -36,10 +36,11 @@ router.post("/", async (req, res) => {
   await user.save();
 
   const token = user.generateAuthToken();
+
   res
     .header("x-auth-token", token)
     .header("access-control-expose-headers", "x-auth-token")
-    .send(_.omit(user, ["password"]));
+    .send(_.omit(user._doc, ["password", "__v"]));
 });
 
 module.exports = router;

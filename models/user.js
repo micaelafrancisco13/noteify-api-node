@@ -1,4 +1,6 @@
 const joi = require("joi");
+const config = require("config");
+const jwt = require("jsonwebtoken");
 joi.objectId = require("joi-objectid")(joi);
 const mongoose = require("mongoose");
 
@@ -9,6 +11,7 @@ const userSchema = new mongoose.Schema({
     minLength: 2,
     required: true,
     trim: true,
+    dateModified: { type: Date, default: Date.now },
   },
   lastName: {
     type: String,
@@ -16,6 +19,7 @@ const userSchema = new mongoose.Schema({
     minLength: 2,
     required: true,
     trim: true,
+    dateModified: { type: Date, default: Date.now },
   },
   email: {
     type: String,
@@ -24,13 +28,17 @@ const userSchema = new mongoose.Schema({
     required: true,
     trim: true,
     unique: true,
+    dateModified: { type: Date, default: Date.now },
   },
   password: {
     type: String,
     minLength: 8,
     maxLength: 1024,
     required: true,
+    dateModified: { type: Date, default: Date.now },
   },
+  dateRegistered: { type: Date, default: Date.now },
+  dateLoggedIn: { type: Date, default: Date.now },
 });
 
 userSchema.methods.generateAuthToken = function () {
@@ -52,7 +60,13 @@ function validateUser(user) {
   const schema = joi.object({
     firstName: joi.string().min(2).max(255).required().label("First name"),
     lastName: joi.string().min(2).max(255).required().label("Last name"),
-    email: joi.string().min(2).max(255).required().label("Email address"),
+    email: joi
+      .string()
+      .email({ tlds: { allow: true } })
+      .min(2)
+      .max(255)
+      .required()
+      .label("Email address"),
     password: joi.string().min(8).max(1024).required().label("Password"),
   });
 
