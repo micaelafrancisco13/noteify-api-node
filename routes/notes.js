@@ -1,5 +1,7 @@
 const { Category } = require("../models/category");
+const { User } = require("../models/user");
 const { Note, validate, isObjectIdValid } = require("../models/note");
+const auth = require("../middleware/auth");
 const express = require("express");
 const router = express.Router();
 const { startOfDay, isEqual, isBefore, isAfter } = require("date-fns");
@@ -28,11 +30,18 @@ router.get("/", async (req, res) => {
   res.send(notes);
 });
 
-router.post("/", async (req, res) => {
+router.post("/", [auth], async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
   const { title, description, categoryId, upcomingDate } = req.body;
+
+  const userId = req.user._id;
+  const user = await User.findById(userId);
+  if (!user)
+    return res
+      .status(404)
+      .send(`The user with the ID of ${userId} was not found.`);
 
   const category = await Category.findById(categoryId);
   if (!category)
@@ -44,6 +53,7 @@ router.post("/", async (req, res) => {
     title,
     description,
     category: categoryId,
+    user: userId,
     upcomingDate,
   });
   await note.save();

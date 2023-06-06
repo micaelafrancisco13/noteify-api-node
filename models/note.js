@@ -24,6 +24,11 @@ const noteSchema = new mongoose.Schema({
     ref: "Category",
     required: true,
   },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   upcomingDate: { type: Date, required: true },
 });
 

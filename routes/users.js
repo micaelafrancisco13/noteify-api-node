@@ -117,7 +117,7 @@ router.put("/me/password", [auth], async (req, res) => {
 
   const currentUser = await User.findByIdAndUpdate(
     userId,
-    { password: await hashedPassword(req.body.newPassword) },
+    { password: await hashedPassword(newPassword) },
     { new: true }
   );
 
