@@ -6,26 +6,10 @@ const express = require("express");
 const router = express.Router();
 const { startOfDay, isEqual, isBefore, isAfter } = require("date-fns");
 
-router.get("/", async (req, res) => {
-  const filter = req.query.filter;
-
-  let notes = await Note.find()
+router.get("/", [auth], async (req, res) => {
+  const notes = await Note.find({ user: req.user._id })
     .sort({ dateLastModified: -1 })
     .populate("category");
-
-  const currentDate = startOfDay(new Date());
-  if (filter === "today")
-    notes = notes.filter((n) =>
-      isEqual(startOfDay(new Date(n.upcomingDate)), currentDate)
-    );
-  else if (filter === "upcoming")
-    notes = notes.filter((n) =>
-      isAfter(startOfDay(new Date(n.upcomingDate)), currentDate)
-    );
-  else if (filter === "past")
-    notes = notes.filter((n) =>
-      isBefore(startOfDay(new Date(n.upcomingDate)), currentDate)
-    );
 
   res.send(notes);
 });
@@ -62,7 +46,7 @@ router.post("/", [auth], async (req, res) => {
   res.send(note);
 });
 
-router.put("/:noteId", async (req, res) => {
+router.put("/:noteId", [auth], async (req, res) => {
   const noteId = req.params.noteId;
 
   if (!isObjectIdValid(noteId))
@@ -79,7 +63,7 @@ router.put("/:noteId", async (req, res) => {
       .status(404)
       .send(`The category with the ID of ${categoryId} was not found.`);
 
-  let note = await Note.findById(noteId);
+  let note = await Note.findOne({ _id: noteId, user: req.user._id });
   if (!note)
     return res
       .status(404)
@@ -95,13 +79,13 @@ router.put("/:noteId", async (req, res) => {
   res.send(note);
 });
 
-router.delete("/:noteId", async (req, res) => {
+router.delete("/:noteId", [auth], async (req, res) => {
   const noteId = req.params.noteId;
 
   if (!isObjectIdValid(noteId))
     return res.status(400).send("Invalid object ID.");
 
-  const note = await Note.findByIdAndRemove(noteId);
+  const note = await Note.findOneAndRemove({ _id: noteId, user: req.user._id });
 
   if (!note)
     return res
@@ -111,13 +95,13 @@ router.delete("/:noteId", async (req, res) => {
   res.send(note);
 });
 
-router.get("/:noteId", async (req, res) => {
+router.get("/:noteId", [auth], async (req, res) => {
   const noteId = req.params.noteId;
 
   if (!isObjectIdValid(noteId))
     return res.status(400).send("Invalid object ID.");
 
-  const note = await Note.findById(noteId);
+  const note = await Note.findOne({ _id: noteId, user: req.user._id });
 
   if (!note)
     return res
@@ -128,3 +112,19 @@ router.get("/:noteId", async (req, res) => {
 });
 
 module.exports = router;
+
+// filter by date query parameter
+// const filter = req.query.filter;
+// const currentDate = startOfDay(new Date());
+// if (filter === "today")
+//   notes = notes.filter((n) =>
+//     isEqual(startOfDay(new Date(n.upcomingDate)), currentDate)
+//   );
+// else if (filter === "upcoming")
+//   notes = notes.filter((n) =>
+//     isAfter(startOfDay(new Date(n.upcomingDate)), currentDate)
+//   );
+// else if (filter === "past")
+//   notes = notes.filter((n) =>
+//     isBefore(startOfDay(new Date(n.upcomingDate)), currentDate)
+//   );
