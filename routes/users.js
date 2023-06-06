@@ -107,12 +107,17 @@ router.put("/me/password", [auth], async (req, res) => {
   const { error } = validatePassword(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const { password } = req.body;
-  const newPassword = await hashedPassword(password);
+  const { currentPassword, newPassword } = req.body;
+
+  const user = await User.findById(req.user._id).select("password");
+  if (!user) return res.status(404).send("User does not exist.");
+
+  const validPassword = await bcrypt.compare(currentPassword, user.password);
+  if (!validPassword) return res.status(400).send("Password is incorrect.");
 
   const currentUser = await User.findByIdAndUpdate(
     userId,
-    { password: newPassword },
+    { password: await hashedPassword(req.body.newPassword) },
     { new: true }
   );
 

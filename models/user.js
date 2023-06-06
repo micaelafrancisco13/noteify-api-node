@@ -97,7 +97,13 @@ function validatePassword(user) {
 
   return joi
     .object({
-      password: baseSchema.extract("password").label("Password"),
+      currentPassword: joi
+        .string()
+        .min(1)
+        .max(1024)
+        .required()
+        .label("Current password"),
+      newPassword: baseSchema.extract("password").label("New password"),
     })
     .validate(user);
 }
