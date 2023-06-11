@@ -99,7 +99,9 @@ router.get("/:noteId", [auth], async (req, res) => {
   if (!isObjectIdValid(noteId))
     return res.status(400).send("Invalid object ID.");
 
-  const note = await Note.findOne({ _id: noteId, user: req.user._id });
+  const note = await Note.findOne({ _id: noteId, user: req.user._id }).populate(
+    "category"
+  );
   if (!note)
     return res
       .status(404)
