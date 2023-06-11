@@ -4,7 +4,6 @@ const { Note, validate, isObjectIdValid } = require("../models/note");
 const auth = require("../middleware/auth");
 const express = require("express");
 const router = express.Router();
-const { startOfDay, isEqual, isBefore, isAfter } = require("date-fns");
 
 router.get("/", [auth], async (req, res) => {
   const notes = await Note.find({ user: req.user._id })
@@ -86,7 +85,6 @@ router.delete("/:noteId", [auth], async (req, res) => {
     return res.status(400).send("Invalid object ID.");
 
   const note = await Note.findOneAndRemove({ _id: noteId, user: req.user._id });
-
   if (!note)
     return res
       .status(404)
@@ -102,7 +100,6 @@ router.get("/:noteId", [auth], async (req, res) => {
     return res.status(400).send("Invalid object ID.");
 
   const note = await Note.findOne({ _id: noteId, user: req.user._id });
-
   if (!note)
     return res
       .status(404)

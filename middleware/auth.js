@@ -7,7 +7,7 @@ module.exports = function (req, res, next) {
   let token = req.header("Authorization");
   if (!token || !token.startsWith("Bearer "))
     return res.status(401).send("Access denied. No token provided.");
-  
+
   token = token.substring(7);
 
   try {
