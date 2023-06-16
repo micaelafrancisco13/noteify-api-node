@@ -8,5 +8,5 @@ require("./startup/db")();
 require("./startup/config")();
 require("./startup/validation")();
 
-const port = process.env.PORT || config.get("port");
+const port = process.env.PORT || config.get("PORT");
 app.listen(port, () => console.log(`Listening on port ${port}...`));

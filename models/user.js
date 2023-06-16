@@ -45,7 +45,7 @@ userSchema.methods.generateAuthToken = function () {
       // lastName: this.lastName,
       // email: this.email,
     },
-    config.get("jwtPrivateKey")
+    config.get("JWT_PRIVATE_KEY")
   );
   return token;
 };

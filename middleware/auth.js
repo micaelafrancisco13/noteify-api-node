@@ -2,7 +2,7 @@ const config = require("config");
 const jwt = require("jsonwebtoken");
 
 module.exports = function (req, res, next) {
-  if (!config.get("requiresAuth")) return next();
+  if (!config.get("REQUIRES_AUTH")) return next();
 
   let token = req.header("Authorization");
   if (!token || !token.startsWith("Bearer "))
@@ -12,7 +12,7 @@ module.exports = function (req, res, next) {
 
   try {
     // this returns the payload defined on the generateAuthToken()
-    const decodedPayload = jwt.verify(token, config.get("jwtPrivateKey"));
+    const decodedPayload = jwt.verify(token, config.get("JWT_PRIVATE_KEY"));
     req.user = decodedPayload;
 
     next();
