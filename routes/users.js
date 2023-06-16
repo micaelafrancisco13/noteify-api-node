@@ -23,7 +23,7 @@ router.get("/me", [auth], async (req, res) => {
   const user = await User.findById(req.user._id).select("-password -notes");
   if (!user) return res.status(404).send("User does not exist.");
 
-  res.send(_.pick(user._doc, ["firstName", "lastName", "email"]));
+  res.send(_.pick(user._doc, ["_id", "firstName", "lastName", "email"]));
 });
 
 router.post("/", async (req, res) => {

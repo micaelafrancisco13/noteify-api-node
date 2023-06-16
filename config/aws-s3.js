@@ -11,6 +11,7 @@ AWS.config.update({
 
 const s3 = new AWS.S3();
 
+// Configure multer to use multer-s3 as the storage engine
 const storage = multerS3({
   s3,
   bucket: "noteify-todo-app",
