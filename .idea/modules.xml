@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/get-done-api-node.iml" filepath="$PROJECT_DIR$/.idea/get-done-api-node.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/noteify-api-node.iml"
+        filepath="$PROJECT_DIR$/.idea/noteify-api-node.iml" />
     </modules>
   </component>
 </project>

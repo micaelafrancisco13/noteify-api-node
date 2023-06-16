@@ -1,6 +1,6 @@
 {
     "JWT_PRIVATE_KEY": "notSecureKey",
-    "DATABASE": "mongodb://127.0.0.1:27017/get-done",
+    "DATABASE": "mongodb://127.0.0.1:27017/noteify",
     "PORT": "3000",
     "REQUIRES_AUTH": true
 }
