@@ -23,7 +23,7 @@ router.get("/me", [auth], async (req, res) => {
   const user = await User.findById(req.user._id).select("-password -notes");
   if (!user) return res.status(404).send("User does not exist.");
 
-  res.send(user);
+  res.send(_.pick(user._doc, ["firstName", "lastName", "email"]));
 });
 
 router.post("/", async (req, res) => {
@@ -70,7 +70,7 @@ router.put("/me/personal", [auth], async (req, res) => {
 
   if (!currentUser) return res.status(404).send("User does not exist.");
 
-  res.send(_.omit(currentUser._doc, ["password"]));
+  res.send(_.pick(currentUser._doc, ["firstName", "lastName", "email"]));
 });
 
 router.put("/me/email", [auth], async (req, res) => {
@@ -85,7 +85,8 @@ router.put("/me/email", [auth], async (req, res) => {
   const { email } = req.body;
 
   const existingUser = await User.findOne({ email });
-  if (existingUser) return res.status(400).send("Email already taken.");
+  if (existingUser)
+    return res.status(400).send(`The email ${email} is already taken.`);
 
   const currentUser = await User.findByIdAndUpdate(
     userId,
@@ -95,7 +96,7 @@ router.put("/me/email", [auth], async (req, res) => {
 
   if (!currentUser) return res.status(404).send("User does not exist.");
 
-  res.send(_.omit(currentUser._doc, ["password"]));
+  res.send(_.pick(currentUser._doc, ["firstName", "lastName", "email"]));
 });
 
 router.put("/me/password", [auth], async (req, res) => {
@@ -113,7 +114,8 @@ router.put("/me/password", [auth], async (req, res) => {
   if (!user) return res.status(404).send("User does not exist.");
 
   const validPassword = await bcrypt.compare(currentPassword, user.password);
-  if (!validPassword) return res.status(400).send("Password is incorrect.");
+  if (!validPassword)
+    return res.status(400).send("Current password is incorrect.");
 
   const currentUser = await User.findByIdAndUpdate(
     userId,
@@ -123,7 +125,7 @@ router.put("/me/password", [auth], async (req, res) => {
 
   if (!currentUser) return res.status(404).send("User does not exist.");
 
-  res.send(_.omit(currentUser._doc, ["password"]));
+  res.send(_.pick(currentUser._doc, ["firstName", "lastName", "email"]));
 });
 
 async function hashedPassword(password) {

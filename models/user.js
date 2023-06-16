@@ -41,9 +41,9 @@ userSchema.methods.generateAuthToken = function () {
   const token = jwt.sign(
     {
       _id: this._id,
-      firstName: this.firstName,
-      lastName: this.lastName,
-      email: this.email,
+      // firstName: this.firstName,
+      // lastName: this.lastName,
+      // email: this.email,
     },
     config.get("jwtPrivateKey")
   );
