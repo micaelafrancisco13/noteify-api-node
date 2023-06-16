@@ -2,6 +2,7 @@ const express = require("express");
 const categories = require("../routes/categories");
 const notes = require("../routes/notes");
 const users = require("../routes/users");
+const displayPictures = require("../routes/displayPictures");
 const auth = require("../routes/auth");
 
 module.exports = function (app) {
@@ -9,5 +10,6 @@ module.exports = function (app) {
   app.use("/api/categories", categories);
   app.use("/api/notes", notes);
   app.use("/api/users", users);
+  app.use("/api/users/display-pictures", displayPictures);
   app.use("/api/auth", auth);
 };
