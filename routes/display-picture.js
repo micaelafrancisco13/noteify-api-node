@@ -37,10 +37,29 @@ router.post("/", [auth, upload.single("image")], async (req, res) => {
     });
     await displayPicture.save();
   }
+
   res.send(_.pick(displayPicture._doc, ["fileName", "objectUrl"]));
 });
 
 router.get("/", [auth], async (req, res, next) => {
+  const userId = req.user._id;
+  const user = await User.findById(userId);
+  if (!user)
+    return res
+      .status(404)
+      .send(`The user with the ID of ${userId} was not found.`);
+
+  const displayPicture = await DisplayPicture.findOne({ user: userId });
+
+  if (!displayPicture)
+    return res
+      .status(404)
+      .send(`The displayPicture with the user ID of ${userId} was not found.`);
+
+  res.send(_.pick(displayPicture._doc, ["fileName", "objectUrl"]));
+});
+
+router.get("/aws", [auth], async (req, res, next) => {
   const userId = req.user._id;
   const folderPath = `users/${userId}/display-picture/`;
 
