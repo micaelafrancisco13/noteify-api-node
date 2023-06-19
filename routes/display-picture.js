@@ -1,9 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {
-  DisplayPicture,
-  validate,
-} = require("../models/display-picture");
+const { DisplayPicture, validate } = require("../models/display-picture");
 const { User } = require("../models/user");
 const { upload, s3, constructFileName } = require("../config/aws-s3");
 const auth = require("../middleware/auth");
@@ -32,18 +29,14 @@ router.post("/", [auth, upload.single("image")], async (req, res) => {
 
   let displayPicture = await DisplayPicture.findOne({ user: userId });
 
-  if (!displayPicture)
+  if (!displayPicture) {
     displayPicture = new DisplayPicture({
       fileName: requestBody.fileName,
       objectUrl: requestBody.objectUrl,
       user,
     });
-  else {
-    displayPicture.fileName = requestBody.fileName;
-    displayPicture.objectUrl = requestBody.objectUrl;
+    await displayPicture.save();
   }
-  await displayPicture.save();
-
   res.send(_.pick(displayPicture._doc, ["fileName", "objectUrl"]));
 });
 
