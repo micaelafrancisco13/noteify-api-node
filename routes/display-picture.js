@@ -41,7 +41,7 @@ router.post("/", [auth, upload.single("image")], async (req, res) => {
   res.send(_.pick(displayPicture._doc, ["fileName", "objectUrl"]));
 });
 
-router.get("/", [auth], async (req, res, next) => {
+router.get("/", [auth], async (req, res) => {
   const userId = req.user._id;
   const user = await User.findById(userId);
   if (!user)
@@ -59,7 +59,8 @@ router.get("/", [auth], async (req, res, next) => {
   res.send(_.pick(displayPicture._doc, ["fileName", "objectUrl"]));
 });
 
-router.get("/aws", [auth], async (req, res, next) => {
+router.get("/aws", [auth], async (req, res) => {
+  console.log("GET DISPLAY PICTURE AWS");
   const userId = req.user._id;
   const folderPath = `users/${userId}/display-picture/`;
 
