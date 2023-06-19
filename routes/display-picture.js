@@ -54,7 +54,7 @@ router.get("/", [auth], async (req, res, next) => {
   if (!displayPicture)
     return res
       .status(404)
-      .send(`The displayPicture with the user ID of ${userId} was not found.`);
+      .send(`Current user does not have a display picture.`);
 
   res.send(_.pick(displayPicture._doc, ["fileName", "objectUrl"]));
 });
