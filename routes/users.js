@@ -31,7 +31,8 @@ router.post("/", async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   let user = await User.findOne({ email: req.body.email });
-  if (user) return res.status(400).send("User already registered.");
+  if (user)
+    return res.status(400).send(`The email ${user.email} is already used`);
 
   const { firstName, lastName, email, password } = req.body;
   user = new User({
@@ -47,6 +48,7 @@ router.post("/", async (req, res) => {
 
   res
     .header("Authorization", `Bearer ${token}`)
+    .header("access-control-expose-headers", "Authorization")
     .send(_.omit(user._doc, ["password"]));
 });
 
