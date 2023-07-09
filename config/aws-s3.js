@@ -37,8 +37,7 @@ const storage = multerS3({
 });
 
 function constructFileName(originalFileName, userId) {
-  return `${userId}`;
-  // return `${userId}${path.extname(originalFileName)}`;
+  return `${userId}${path.extname(originalFileName)}`;
 }
 
 const upload = multer({ storage });
