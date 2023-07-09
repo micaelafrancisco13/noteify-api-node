@@ -1,6 +1,6 @@
 const joi = require("joi");
 const mongoose = require("mongoose");
-const { startOfDay } = require("date-fns");
+const { startOfDay, parseISO } = require("date-fns");
 
 const noteSchema = new mongoose.Schema({
   title: {
@@ -54,7 +54,10 @@ function validateNote(note) {
       }),
   });
 
-  return schema.validate(note);
+  return schema.validate({
+    ...note,
+    upcomingDate: startOfDay(parseISO(note.upcomingDate)),
+  });
 }
 
 function isObjectIdValid(id) {
