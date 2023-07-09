@@ -39,6 +39,8 @@ noteSchema.pre("save", async function () {
 const Note = mongoose.model("note", noteSchema);
 
 function validateNote(note) {
+  console.log("startOfDay(new Date())", startOfDay(new Date()));
+
   const schema = joi.object({
     title: joi.string().min(1).max(255).required().label("Title"),
     description: joi.string().min(1).max(255).required().label("Description"),
