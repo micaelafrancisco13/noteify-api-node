@@ -5,7 +5,7 @@ const multerS3 = require("multer-s3");
 const path = require("path");
 const config = require("config");
 
-const { S3Client, S3 } = require("@aws-sdk/client-s3");
+const { S3Client } = require("@aws-sdk/client-s3");
 
 // AWS.config.update({
 //   accessKeyId: config.get("AWS_ACCESS_KEY"),

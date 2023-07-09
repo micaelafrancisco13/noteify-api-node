@@ -5,7 +5,7 @@ const { User } = require("../models/user");
 const { upload, s3, constructFileName } = require("../config/aws-s3");
 const auth = require("../middleware/auth");
 const bucketName = "noteify-todo-app";
-const AWS = require("aws-sdk");
+const config = require("config");
 const _ = require("lodash");
 
 router.post("/", [auth, upload.single("image")], async (req, res) => {
@@ -16,7 +16,7 @@ router.post("/", [auth, upload.single("image")], async (req, res) => {
       .status(404)
       .send(`The user with the ID of ${userId} was not found.`);
 
-  const objectUrl = `https://${bucketName}.s3.${AWS.config.region}.amazonaws.com/${req.file.key}`;
+  const objectUrl = `https://${bucketName}.s3.${config.get("AWS_REGION")}.amazonaws.com/${req.file.key}`;
 
   const requestBody = {
     fileName: constructFileName(req.file.originalname, req.user._id),
