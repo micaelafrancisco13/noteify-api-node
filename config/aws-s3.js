@@ -1,16 +1,26 @@
-const AWS = require("aws-sdk");
+// const AWS = require("aws-sdk");
+
 const multer = require("multer");
 const multerS3 = require("multer-s3");
 const path = require("path");
 const config = require("config");
 
-AWS.config.update({
-  accessKeyId: config.get("AWS_ACCESS_KEY"),
-  secretAccessKey: config.get("AWS_SECRET_ACCESS_KEY"),
+const { S3Client, S3 } = require("@aws-sdk/client-s3");
+
+// AWS.config.update({
+//   accessKeyId: config.get("AWS_ACCESS_KEY"),
+//   secretAccessKey: config.get("AWS_SECRET_ACCESS_KEY"),
+//   region: config.get("AWS_REGION"),
+// });
+
+// const s3 = new AWS.S3();
+const s3 = new S3Client({
+  credentials: {
+    accessKeyId: config.get("AWS_ACCESS_KEY"),
+    secretAccessKey: config.get("AWS_SECRET_ACCESS_KEY"),
+  },
   region: config.get("AWS_REGION"),
 });
-
-const s3 = new AWS.S3();
 
 // Configure multer to use multer-s3 as the storage engine
 const storage = multerS3({
