@@ -1,6 +1,7 @@
 const joi = require("joi");
 const mongoose = require("mongoose");
 const { startOfDay, parseISO } = require("date-fns");
+const { utcToZonedTime, formatInTimeZone } = require("date-fns-tz");
 
 const noteSchema = new mongoose.Schema({
   title: {
@@ -39,11 +40,12 @@ noteSchema.pre("save", async function () {
 const Note = mongoose.model("note", noteSchema);
 
 function validateNote(note) {
-  console.log("startOfDay(new Date())", startOfDay(new Date()));
-  console.log(
-    "startOfDay(parseISO(note.upcomingDate))",
-    startOfDay(parseISO(note.upcomingDate))
+  const { currentDate, upcomingDate } = convertTimezone(
+    parseISO(note.upcomingDate)
   );
+
+  console.log("currentDate", currentDate);
+  console.log("upcomingDate", upcomingDate);
 
   const schema = joi.object({
     title: joi.string().min(1).max(255).required().label("Title"),
@@ -51,7 +53,7 @@ function validateNote(note) {
     categoryId: joi.objectId().required().label("Category ID"),
     upcomingDate: joi
       .date()
-      .min(startOfDay(new Date()))
+      .min(currentDate)
       .required()
       .label("Upcoming date")
       .messages({
@@ -62,8 +64,21 @@ function validateNote(note) {
 
   return schema.validate({
     ...note,
-    upcomingDate: startOfDay(parseISO(note.upcomingDate)),
+    upcomingDate,
   });
+}
+
+function convertTimezone(parsedUpcomingDate) {
+  const currentUserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const format = "yyyy-MM-dd";
+  return {
+    currentDate: new Date(
+      formatInTimeZone(new Date(), currentUserTimezone, format)
+    ),
+    upcomingDate: new Date(
+      formatInTimeZone(parsedUpcomingDate, currentUserTimezone, format)
+    ),
+  };
 }
 
 function isObjectIdValid(id) {
