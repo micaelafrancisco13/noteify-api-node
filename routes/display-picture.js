@@ -2,11 +2,15 @@ const express = require("express");
 const router = express.Router();
 const { DisplayPicture, validate } = require("../models/display-picture");
 const { User } = require("../models/user");
-const { upload, s3, constructFileName } = require("../config/aws-s3");
+const { upload, s3 } = require("../config/aws-s3");
 const auth = require("../middleware/auth");
 const bucketName = "noteify-todo-app";
 const config = require("config");
 const _ = require("lodash");
+const path = require("path");
+
+const S3_BUCKET_NAME = config.get("S3_BUCKET_NAME");
+const AWS_REGION = config.get("AWS_REGION");
 
 router.post("/", [auth, upload.single("image")], async (req, res) => {
   const userId = req.user._id;
@@ -16,29 +20,27 @@ router.post("/", [auth, upload.single("image")], async (req, res) => {
       .status(404)
       .send(`The user with the ID of ${userId} was not found.`);
 
-  const objectUrl = `https://${bucketName}.s3.${config.get("AWS_REGION")}.amazonaws.com/${req.file.key}`;
-
   const requestBody = {
-    fileName: constructFileName(req.file.originalname, req.user._id),
-    objectUrl,
+    fileName: req.user._id,
+    objectUrl: `https://${S3_BUCKET_NAME}.s3.${AWS_REGION}.amazonaws.com/${req.file.key}`,
     userId,
   };
 
   const { error } = validate(requestBody);
   if (error) return res.status(400).send(error.details[0].message);
 
-  let displayPicture = await DisplayPicture.findOne({ user: userId });
+  const displayPicture = new DisplayPicture({
+    fileName: requestBody.fileName,
+    objectUrl: requestBody.objectUrl,
+    user,
+  });
+  await displayPicture.save();
 
-  if (!displayPicture) {
-    displayPicture = new DisplayPicture({
-      fileName: requestBody.fileName,
-      objectUrl: requestBody.objectUrl,
-      user,
-    });
-    await displayPicture.save();
-  }
+  const fileExtension = path.extname(req.file.originalname);
+  const newDisplayPicture = displayPicture;
+  newDisplayPicture._doc.fileName = `${displayPicture.fileName}${fileExtension}`;
 
-  res.send(_.pick(displayPicture._doc, ["fileName", "objectUrl"]));
+  res.send(_.pick(newDisplayPicture._doc, ["fileName", "objectUrl"]));
 });
 
 router.get("/", [auth], async (req, res) => {
