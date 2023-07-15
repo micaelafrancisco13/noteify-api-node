@@ -1,6 +1,6 @@
 const joi = require("joi");
 const mongoose = require("mongoose");
-const { startOfDay, parseISO, isAfter,isEqual } = require("date-fns");
+const { startOfDay, parseISO, isAfter, isEqual } = require("date-fns");
 const { zonedTimeToUtc, formatInTimeZone } = require("date-fns-tz");
 
 const noteSchema = new mongoose.Schema({
@@ -48,13 +48,10 @@ function validateNote(note) {
 
   const customDateValidator = (value, helpers) => {
     if (
-      !isAfter(parsedUpcomingDate, currentDate) &&
-      !isEqual(parsedUpcomingDate, currentDate)
-    ) {
-      return helpers.error("date.invalid", {
-        message: `"Upcoming date" must be equal to or later than the current date`,
-      });
-    }
+      !isAfter(parsedValue, currentDate) &&
+      !isEqual(parsedValue, currentDate)
+    )
+      return helpers.error("date.invalid");
 
     return value;
   };
@@ -67,6 +64,10 @@ function validateNote(note) {
       .date()
       .custom(customDateValidator)
       .required()
+      .messages({
+        "date.invalid":
+          `"Upcoming date" must be equal to or later than the current date`,
+      })
       .label("Upcoming date"),
   });
 
