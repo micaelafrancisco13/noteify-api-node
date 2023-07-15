@@ -1,6 +1,6 @@
 const joi = require("joi");
 const mongoose = require("mongoose");
-const { startOfDay, parseISO } = require("date-fns");
+const { startOfDay, parseISO, isAfter } = require("date-fns");
 const { zonedTimeToUtc, formatInTimeZone } = require("date-fns-tz");
 
 const noteSchema = new mongoose.Schema({
@@ -40,14 +40,17 @@ noteSchema.pre("save", async function () {
 const Note = mongoose.model("note", noteSchema);
 
 function validateNote(note) {
-  const parsedUpcomingDate = parseISO(note.upcomingDate);
-  const { currentDate, upcomingDate } = convertTimezone(parsedUpcomingDate);
+  const customDateValidator = (value, helpers) => {
+    const currentDate = new Date();
+    const upcomingDate = value;
 
-  if (isAfter(parsedUpcomingDate, currentDate)) {
-    console.log("Upcoming date is valid");
-  } else {
-    console.log("Upcoming date is not valid");
-  }
+    if (!isAfter(upcomingDate, currentDate))
+      return helpers.error("date.invalid", {
+        message: `"Upcoming date" must be equal or later than the current date`,
+      });
+
+    return value;
+  };
 
   const schema = joi.object({
     title: joi.string().min(1).max(255).required().label("Title"),
@@ -55,19 +58,12 @@ function validateNote(note) {
     categoryId: joi.objectId().required().label("Category ID"),
     upcomingDate: joi
       .date()
-      .min(currentDate)
+      .custom(customDateValidator)
       .required()
-      .label("Upcoming date")
-      .messages({
-        "date.min": '"Upcoming date" must be a date in the future',
-        "any.required": '"Upcoming date" is required',
-      }),
+      .label("Upcoming date"),
   });
 
-  return schema.validate({
-    ...note,
-    upcomingDate,
-  });
+  return schema.validate(note);
 }
 
 function convertTimezone(parsedUpcomingDate) {
