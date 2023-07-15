@@ -58,10 +58,7 @@ function validateNote(note) {
   );
 
   // Compare the converted parsed upcoming date with the current date
-  const dateComparison = compareAsc(
-    parsedUpcomingDateSingapore,
-    currentDateDev
-  );
+  const dateComparison = compareAsc(parsedUpcomingDateSingapore, currentDate);
 
   if (dateComparison >= 0) {
     console.log("The parsedUpcomingDate is valid.");
