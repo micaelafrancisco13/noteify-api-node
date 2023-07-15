@@ -40,14 +40,21 @@ noteSchema.pre("save", async function () {
 const Note = mongoose.model("note", noteSchema);
 
 function validateNote(note) {
-  const customDateValidator = (value, helpers) => {
-    const currentDate = new Date();
-    const upcomingDate = value;
+  const currentDate = new Date();
+  const parsedUpcomingDate = parseISO(note.upcomingDate);
 
-    if (!isAfter(upcomingDate, currentDate))
+  console.log("currentDate", currentDate);
+  console.log("parsedUpcomingDate", parsedUpcomingDate);
+
+  const customDateValidator = (value, helpers) => {
+    if (
+      !isAfter(parsedUpcomingDate, currentDate) &&
+      !isEqual(parsedUpcomingDate, currentDate)
+    ) {
       return helpers.error("date.invalid", {
-        message: `"Upcoming date" must be equal or later than the current date`,
+        message: `"Upcoming date" must be equal to or later than the current date`,
       });
+    }
 
     return value;
   };
