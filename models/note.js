@@ -46,59 +46,20 @@ noteSchema.pre("save", async function () {
 const Note = mongoose.model("note", noteSchema);
 
 function validateNote(note) {
-  const currentDate = new Date();
-  const parsedUpcomingDate = parseISO(note.upcomingDate);
+  const currentDate = startOfDay(new Date());
+  const parsedUpcomingDate = startOfDay(parseISO(note.upcomingDate));
 
   console.log("currentDate", currentDate);
   console.log("parsedUpcomingDate", parsedUpcomingDate);
-
-  const userTimeZoneOffset = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-  const upcomingDate = zonedTimeToUtc(parsedUpcomingDate, userTimeZoneOffset);
-  const userCurrentDate = zonedTimeToUtc(currentDate, userTimeZoneOffset);
-
-  console.log("upcomingDate", upcomingDate);
-  console.log("userCurrentDate", userCurrentDate);
-
-  const dateComparison = compareAsc(userCurrentDate, upcomingDate);
-
-  if (dateComparison <= 0) {
-    console.log("The upcoming date is valid.");
-    // Process the request further
-  } else {
-    console.log("The upcoming date is invalid.");
-    // Handle the error or return an error response
-  }
 
   const schema = joi.object({
     title: joi.string().min(1).max(255).required().label("Title"),
     description: joi.string().min(1).max(255).required().label("Description"),
     categoryId: joi.objectId().required().label("Category ID"),
-    upcomingDate: joi
-      .date()
-      // .custom(customDateValidator)
-      .min(currentDate)
-      .required()
-      // .messages({
-      //   "date.invalid": `"Upcoming date" must be equal to or later than the current date`,
-      // })
-      .label("Upcoming date"),
+    upcomingDate: joi.date().min(currentDate).required().label("Upcoming date"),
   });
 
   return schema.validate(note);
-}
-
-function convertTimezone(parsedUpcomingDate) {
-  const currentUserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const format = "yyyy-MM-dd";
-  const timeZone = "Asia/Singapore";
-
-  return {
-    currentDate: new Date(
-      formatInTimeZone(new Date(), currentUserTimezone, format)
-    ),
-    upcomingDate: zonedTimeToUtc(parsedUpcomingDate, timeZone),
-  };
 }
 
 function isObjectIdValid(id) {
