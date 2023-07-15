@@ -45,7 +45,7 @@ function validateNote(note) {
   );
 
   console.log("current date", currentDate);
-  console.log("upcoming date", upcomingDate);
+  console.log("note.upcomingDate", note.upcomingDate);
 
   const schema = joi.object({
     title: joi.string().min(1).max(255).required().label("Title"),
@@ -64,7 +64,7 @@ function validateNote(note) {
 
   return schema.validate({
     ...note,
-    upcomingDate,
+    note.upcomingDate,
   });
 }
 
