@@ -40,19 +40,19 @@ noteSchema.pre("save", async function () {
 const Note = mongoose.model("note", noteSchema);
 
 function validateNote(note) {
-  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  console.log("userTimezone", userTimezone);
+  const { timezone, ...rest } = note;
 
-  const currentDate = new Date(); // Get the current date in the server's time zone
-  const upcomingDate = parseISO(note.upcomingDate); // Parse the upcomingDate from the client
+  const currentDate = new Date();
+  const upcomingDate = parseISO(note.upcomingDate);
 
   const currentDateInTimeZone = startOfDay(
-    utcToZonedTime(currentDate, userTimezone)
+    utcToZonedTime(currentDate, timezone)
   );
   const upcomingDateInTimeZone = startOfDay(
-    utcToZonedTime(upcomingDate, userTimezone)
+    utcToZonedTime(upcomingDate, timezone)
   );
 
+  console.log("timezone", timezone);
   console.log("currentDate", currentDateInTimeZone);
   console.log("upcomingDate", upcomingDateInTimeZone);
 
@@ -67,7 +67,7 @@ function validateNote(note) {
       .label("Upcoming date"),
   });
 
-  return schema.validate({ ...note, upcomingDate: upcomingDateInTimeZone });
+  return schema.validate({ ...rest, upcomingDate: upcomingDateInTimeZone });
 }
 
 function isObjectIdValid(id) {
