@@ -46,6 +46,25 @@ function validateNote(note) {
   console.log("currentDate", currentDate);
   console.log("parsedUpcomingDate", parsedUpcomingDate);
 
+  const parsedUpcomingDateSingapore = zonedTimeToUtc(
+    parsedUpcomingDate,
+    "Asia/Singapore"
+  );
+
+  // Compare the converted parsed upcoming date with the current date
+  const dateComparison = compareAsc(
+    parsedUpcomingDateSingapore,
+    currentDateDev
+  );
+
+  if (dateComparison >= 0) {
+    console.log("The parsedUpcomingDate is valid.");
+    // Process the request further
+  } else {
+    console.log("The parsedUpcomingDate is invalid.");
+    // Handle the error or return an error response
+  }
+
   const customDateValidator = (value, helpers) => {
     if (
       !isAfter(parsedUpcomingDate, currentDate) &&
