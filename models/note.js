@@ -1,13 +1,7 @@
 const joi = require("joi");
 const mongoose = require("mongoose");
-const {
-  startOfDay,
-  parseISO,
-  isAfter,
-  isEqual,
-  compareAsc,
-} = require("date-fns");
-const { zonedTimeToUtc, formatInTimeZone } = require("date-fns-tz");
+const { startOfDay, parseISO, formatISO } = require("date-fns");
+const { zonedTimeToUtc } = require("date-fns-tz");
 
 const noteSchema = new mongoose.Schema({
   title: {
@@ -46,8 +40,16 @@ noteSchema.pre("save", async function () {
 const Note = mongoose.model("note", noteSchema);
 
 function validateNote(note) {
-  const currentDate = startOfDay(new Date());
-  const parsedUpcomingDate = startOfDay(parseISO(note.upcomingDate));
+  const timeZone = "UTC"; // Use UTC for consistent date comparison
+
+  // const currentDate = startOfDay(new Date());
+  // const parsedUpcomingDate = startOfDay(parseISO(note.upcomingDate));
+
+  const currentDate = zonedTimeToUtc(startOfDay(new Date()), timeZone);
+  const parsedUpcomingDate = zonedTimeToUtc(
+    startOfDay(parseISO(note.upcomingDate)),
+    timeZone
+  );
 
   console.log("currentDate", currentDate);
   console.log("parsedUpcomingDate", parsedUpcomingDate);
@@ -59,7 +61,7 @@ function validateNote(note) {
     upcomingDate: joi.date().min(currentDate).required().label("Upcoming date"),
   });
 
-  return schema.validate(note);
+  return schema.validate({ ...note, upcomingDate: parsedUpcomingDate });
 }
 
 function isObjectIdValid(id) {
