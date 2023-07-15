@@ -44,6 +44,9 @@ function validateNote(note) {
     parseISO(note.upcomingDate)
   );
 
+  console.log("current date", currentDate);
+  console.log("upcoming date", upcomingDate);
+
   const schema = joi.object({
     title: joi.string().min(1).max(255).required().label("Title"),
     description: joi.string().min(1).max(255).required().label("Description"),
