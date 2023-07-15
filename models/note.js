@@ -1,6 +1,12 @@
 const joi = require("joi");
 const mongoose = require("mongoose");
-const { startOfDay, parseISO, isAfter, isEqual } = require("date-fns");
+const {
+  startOfDay,
+  parseISO,
+  isAfter,
+  isEqual,
+  compareAsc,
+} = require("date-fns");
 const { zonedTimeToUtc, formatInTimeZone } = require("date-fns-tz");
 
 const noteSchema = new mongoose.Schema({
