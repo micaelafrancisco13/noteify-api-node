@@ -64,20 +64,19 @@ function validateNote(note) {
 
   return schema.validate({
     ...note,
-    note.upcomingDate,
+    upcomingDate,
   });
 }
 
 function convertTimezone(parsedUpcomingDate) {
-  const currentUserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  // const currentUserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const format = "yyyy-MM-dd";
+  const timeZone = "Asia/Singapore";
   return {
-    currentDate: new Date(
-      formatInTimeZone(new Date(), currentUserTimezone, format)
-    ),
-    upcomingDate: new Date(
-      formatInTimeZone(parsedUpcomingDate, currentUserTimezone, format)
-    ),
+    currentDate: format(new Date(), format, { timeZone }),
+    upcomingDate: format(parsedUpcomingDate, format, {
+      timeZone,
+    }),
   };
 }
 
