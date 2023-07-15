@@ -73,8 +73,8 @@ function convertTimezone(parsedUpcomingDate) {
   const format = "yyyy-MM-dd";
   const timeZone = "Asia/Singapore";
   return {
-    currentDate: format(new Date(), format, { timeZone }),
-    upcomingDate: format(parsedUpcomingDate, format, {
+    currentDate: formatInTimeZone(new Date(), format, { timeZone }),
+    upcomingDate: formatInTimeZone(parsedUpcomingDate, format, {
       timeZone,
     }),
   };
