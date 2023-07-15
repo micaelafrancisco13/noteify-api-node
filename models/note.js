@@ -69,14 +69,13 @@ function validateNote(note) {
 }
 
 function convertTimezone(parsedUpcomingDate) {
-  // const currentUserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const currentUserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const format = "yyyy-MM-dd";
   const timeZone = "Asia/Singapore";
+
   return {
-    currentDate: formatInTimeZone(new Date(), format, { timeZone }),
-    upcomingDate: formatInTimeZone(parsedUpcomingDate, format, {
-      timeZone,
-    }),
+    currentDate: zonedTimeToUtc(new Date(), timeZone),
+    upcomingDate: zonedTimeToUtc(parsedUpcomingDate, timeZone),
   };
 }
 
