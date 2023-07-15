@@ -46,8 +46,8 @@ noteSchema.pre("save", async function () {
 const Note = mongoose.model("note", noteSchema);
 
 function validateNote(note) {
-  const currentDate = startOfDay(new Date());
-  const parsedUpcomingDate = startOfDay(parseISO(note.upcomingDate));
+  const currentDate = new Date();
+  const parsedUpcomingDate = parseISO(note.upcomingDate);
 
   console.log("currentDate", currentDate);
   console.log("parsedUpcomingDate", parsedUpcomingDate);
