@@ -1,7 +1,7 @@
 const joi = require("joi");
 const mongoose = require("mongoose");
 const { startOfDay, parseISO } = require("date-fns");
-const { zonedTimeToUtc } = require("date-fns-tz");
+const { zonedTimeToUtc, formatInTimeZone } = require("date-fns-tz");
 
 const noteSchema = new mongoose.Schema({
   title: {
@@ -44,8 +44,8 @@ function validateNote(note) {
     parseISO(note.upcomingDate)
   );
 
-  console.log("current date", currentDate);
-  console.log("note.upcomingDate", note.upcomingDate);
+  console.log("current date", startOfDay(currentDate));
+  console.log("upcomingDate", startOfDay(upcomingDate));
 
   const schema = joi.object({
     title: joi.string().min(1).max(255).required().label("Title"),
@@ -74,7 +74,9 @@ function convertTimezone(parsedUpcomingDate) {
   const timeZone = "Asia/Singapore";
 
   return {
-    currentDate: zonedTimeToUtc(new Date(), timeZone),
+    currentDate: new Date(
+      formatInTimeZone(new Date(), currentUserTimezone, format)
+    ),
     upcomingDate: zonedTimeToUtc(parsedUpcomingDate, timeZone),
   };
 }
