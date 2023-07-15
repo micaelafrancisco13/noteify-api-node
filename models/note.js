@@ -52,31 +52,23 @@ function validateNote(note) {
   console.log("currentDate", currentDate);
   console.log("parsedUpcomingDate", parsedUpcomingDate);
 
-  const parsedUpcomingDateSingapore = zonedTimeToUtc(
-    parsedUpcomingDate,
-    "Asia/Singapore"
-  );
+  const userTimeZoneOffset = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  // Compare the converted parsed upcoming date with the current date
-  const dateComparison = compareAsc(parsedUpcomingDateSingapore, currentDate);
+  const upcomingDate = zonedTimeToUtc(parsedUpcomingDate, userTimeZoneOffset);
+  const userCurrentDate = zonedTimeToUtc(currentDate, userTimeZoneOffset);
 
-  if (dateComparison >= 0) {
-    console.log("The parsedUpcomingDate is valid.");
+  console.log("upcomingDate", upcomingDate);
+  console.log("userCurrentDate", userCurrentDate);
+
+  const dateComparison = compareAsc(userCurrentDate, upcomingDate);
+
+  if (dateComparison <= 0) {
+    console.log("The upcoming date is valid.");
     // Process the request further
   } else {
-    console.log("The parsedUpcomingDate is invalid.");
+    console.log("The upcoming date is invalid.");
     // Handle the error or return an error response
   }
-
-  const customDateValidator = (value, helpers) => {
-    if (
-      !isAfter(parsedUpcomingDate, currentDate) &&
-      !isEqual(parsedUpcomingDate, currentDate)
-    )
-      return helpers.error("date.invalid");
-
-    return value;
-  };
 
   const schema = joi.object({
     title: joi.string().min(1).max(255).required().label("Title"),
@@ -84,11 +76,12 @@ function validateNote(note) {
     categoryId: joi.objectId().required().label("Category ID"),
     upcomingDate: joi
       .date()
-      .custom(customDateValidator)
+      // .custom(customDateValidator)
+      .min(currentDate)
       .required()
-      .messages({
-        "date.invalid": `"Upcoming date" must be equal to or later than the current date`,
-      })
+      // .messages({
+      //   "date.invalid": `"Upcoming date" must be equal to or later than the current date`,
+      // })
       .label("Upcoming date"),
   });
 
