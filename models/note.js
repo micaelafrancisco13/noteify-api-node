@@ -40,12 +40,14 @@ noteSchema.pre("save", async function () {
 const Note = mongoose.model("note", noteSchema);
 
 function validateNote(note) {
-  const { currentDate, upcomingDate } = convertTimezone(
-    parseISO(note.upcomingDate)
-  );
+  const parsedUpcomingDate = parseISO(note.upcomingDate);
+  const { currentDate, upcomingDate } = convertTimezone(parsedUpcomingDate);
 
-  console.log("current date", currentDate);
-  console.log("upcomingDate", upcomingDate);
+  if (isAfter(parsedUpcomingDate, currentDate)) {
+    console.log("Upcoming date is valid");
+  } else {
+    console.log("Upcoming date is not valid");
+  }
 
   const schema = joi.object({
     title: joi.string().min(1).max(255).required().label("Title"),
