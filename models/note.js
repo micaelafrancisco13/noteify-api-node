@@ -40,16 +40,17 @@ noteSchema.pre("save", async function () {
 const Note = mongoose.model("note", noteSchema);
 
 function validateNote(note) {
-  const timeZone = "Asia/Manila"; // Assuming the user's time zone is in the Philippines
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  console.log("userTimezone", userTimezone);
 
   const currentDate = new Date(); // Get the current date in the server's time zone
   const upcomingDate = parseISO(note.upcomingDate); // Parse the upcomingDate from the client
 
   const currentDateInTimeZone = startOfDay(
-    utcToZonedTime(currentDate, timeZone)
+    utcToZonedTime(currentDate, userTimezone)
   );
   const upcomingDateInTimeZone = startOfDay(
-    utcToZonedTime(upcomingDate, timeZone)
+    utcToZonedTime(upcomingDate, userTimezone)
   );
 
   console.log("currentDate", currentDateInTimeZone);
