@@ -1,7 +1,7 @@
 const joi = require("joi");
 const mongoose = require("mongoose");
-const { startOfDay, parseISO, formatISO } = require("date-fns");
-const { zonedTimeToUtc } = require("date-fns-tz");
+const { parseISO, startOfDay } = require("date-fns");
+const { utcToZonedTime } = require("date-fns-tz");
 
 const noteSchema = new mongoose.Schema({
   title: {
@@ -40,28 +40,33 @@ noteSchema.pre("save", async function () {
 const Note = mongoose.model("note", noteSchema);
 
 function validateNote(note) {
-  const timeZone = "UTC"; // Use UTC for consistent date comparison
+  const timeZone = "Asia/Manila"; // Assuming the user's time zone is in the Philippines
 
-  // const currentDate = startOfDay(new Date());
-  // const parsedUpcomingDate = startOfDay(parseISO(note.upcomingDate));
+  const currentDate = new Date(); // Get the current date in the server's time zone
+  const upcomingDate = parseISO(note.upcomingDate); // Parse the upcomingDate from the client
 
-  const currentDate = zonedTimeToUtc(startOfDay(new Date()), timeZone);
-  const parsedUpcomingDate = zonedTimeToUtc(
-    startOfDay(parseISO(note.upcomingDate)),
-    timeZone
+  const currentDateInTimeZone = startOfDay(
+    utcToZonedTime(currentDate, timeZone)
+  );
+  const upcomingDateInTimeZone = startOfDay(
+    utcToZonedTime(upcomingDate, timeZone)
   );
 
-  console.log("currentDate", currentDate);
-  console.log("parsedUpcomingDate", parsedUpcomingDate);
+  console.log("currentDate", currentDateInTimeZone);
+  console.log("upcomingDate", upcomingDateInTimeZone);
 
   const schema = joi.object({
     title: joi.string().min(1).max(255).required().label("Title"),
     description: joi.string().min(1).max(255).required().label("Description"),
     categoryId: joi.objectId().required().label("Category ID"),
-    upcomingDate: joi.date().min(currentDate).required().label("Upcoming date"),
+    upcomingDate: joi
+      .date()
+      .min(currentDateInTimeZone)
+      .required()
+      .label("Upcoming date"),
   });
 
-  return schema.validate({ ...note, upcomingDate: parsedUpcomingDate });
+  return schema.validate({ ...note, upcomingDate: upcomingDateInTimeZone });
 }
 
 function isObjectIdValid(id) {
