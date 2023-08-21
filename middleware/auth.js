@@ -12,17 +12,17 @@ module.exports = function (req, res, next) {
 
   try {
     // this returns the payload defined on the generateAuthToken()
-    const privateKey = `-----BEGIN PUBLIC KEY-----\n${config.get("JWT_PRIVATE_KEY")}\n-----END PUBLIC KEY-----`;
+    const privateKey = `-----BEGIN PUBLIC KEY-----\n${config.get(
+      "JWT_PRIVATE_KEY"
+    )}\n-----END PUBLIC KEY-----`;
     const options = {
       algorithms: ["RS256"],
     };
-    const decodedPayload = jwt.verify(
-      token,
-      privateKey,
-      options
-    );
-    console.log("decodedPayload", decodedPayload);
-    req.user = decodedPayload;
+    const decodedPayload = jwt.verify(token, privateKey, options);
+    req.user = {
+      _id: decodedPayload.sub,
+      token
+    };
 
     next();
   } catch (ex) {

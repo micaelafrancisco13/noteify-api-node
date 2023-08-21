@@ -9,6 +9,8 @@ const {
 const auth = require("../middleware/auth");
 const _ = require("lodash");
 const bcrypt = require("bcrypt");
+const axios = require("axios");
+const config = require("config");
 const express = require("express");
 const router = express.Router();
 
@@ -17,13 +19,25 @@ router.post("/logout", async (req, res) => {
 });
 
 router.get("/me", [auth], async (req, res) => {
-  if (!isObjectIdValid(req.user._id))
-    return res.status(400).send("Invalid object ID.");
+  const uri = `${config.get("KEYCLOAK_URI")}${config.get(
+    "KEYCLOAK_USER_INFO_ENDPOINT"
+  )}`;
+  
+  const options = {
+    headers: {
+      Authorization: `Bearer ${req.user.token}`,
+    },
+  };
 
-  const user = await User.findById(req.user._id).select("-password -notes");
-  if (!user) return res.status(404).send("User does not exist.");
-
-  res.send(_.pick(user._doc, ["_id", "firstName", "lastName", "email"]));
+  axios
+    .get(uri, options)
+    .then((response) => {
+      return res.send(response.data);
+    })
+    .catch((exception) => {
+      console.log("exception", exception);
+      return res.status(404).send("User does not exist.");
+    });
 });
 
 router.post("/", async (req, res) => {
